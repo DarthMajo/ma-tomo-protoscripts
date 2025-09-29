@@ -1,0 +1,29 @@
+Gatehouse:
+    The town road should have an exit point out of the map, but the player is
+    confined within the town boundaries. This exit point is a gatehouse or a
+    customs gate of some sort.
+
+Possible home layout:
+    https://davisframe.com/floor-plans/classic-colonial-1b/ would be 2x1 tiles
+
+Train:
+    It could be fun if the town has a train that runs into it.
+    For ease of implementation, the train just takes a straight path.
+    So it will just go either WEST <--> EAST or NORTH <--> SOUTH 
+
+    So here is a blank map.
+        0 0 0 0 0 0 0 0 0 0
+        0 0 0 0 0 0 0 0 0 0
+        0 0 0 0 0 0 0 0 0 0
+        0 0 0 0 0 0 0 0 0 0
+        0 0 0 0 0 0 0 0 0 0
+
+    The train would generate like this:
+        0 0 0 0 0 0 0 0 0 0
+        0 0 0 0 0 0 0 0 0 0
+        R R R R S S S S R R
+        0 0 0 0 0 0 0 0 0 0
+        0 0 0 0 0 0 0 0 0 0
+    In this figure, the R stands for a rail tile, and the S is part of the 
+    station prefab. Who knows how long the rail should be but aparently 
+    regional trains are around 40m long minimum

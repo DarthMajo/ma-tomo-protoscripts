@@ -1,9 +1,37 @@
 # The prototype for building road patterns
 
+import random
+
 import map
 
+def choose_gate_tile(x, y):
+    # Do we do the north, south, east, or west corner?
+    #   0 = N
+    #   1 = S
+    #   2 = E
+    #   3 = W
+    edge = random.randint(0, 3)
+
+    if edge < 2:
+        # North or South
+        if random.randint(0, 1) == 0:
+            return (random.randint(1, x - 2), 0) # North
+        else:
+            return (random.randint(1, x - 2), y - 1) # South
+    else:
+        # East or West
+        if random.randint(0, 1) == 0:
+            return (0, random.randint(1, y - 2)) # West
+        else:
+            return (x - 1, random.randint(1, y - 2)) # East
+
 if __name__ == '__main__':
-    myMap = map.Map(10, 5)
-    myMap.set_tile(4, 4, 1)
-    print(myMap.get_tile(4,4))
+    map_size_x = 16
+    map_size_y = 9
+    myMap = map.Map(map_size_x, map_size_y)
+
+    # Get gate tile
+    gt = choose_gate_tile(map_size_x, map_size_y)
+    myMap.set_tile(gt[0], gt[1], 'G')
+
     myMap.print_map()
