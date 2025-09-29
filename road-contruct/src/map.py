@@ -6,6 +6,9 @@ class Map():
         self.sizeX = x
         self.sizeY = y
 
+    def get_tile(self, x, y):
+        return self.map[y][x]
+
     def init_map(self, x, y):
         mapY = []
 
@@ -23,3 +26,6 @@ class Map():
             for x in range(self.sizeX):
                 line += str(self.map[y][x]) + ' '
             print(line)
+
+    def set_tile(self, x, y, new_value):
+        self.map[y][x] = new_value
