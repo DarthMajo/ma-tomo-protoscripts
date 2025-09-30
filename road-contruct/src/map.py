@@ -19,11 +19,25 @@ class Map():
                     or y == 0 or y == self.sizeY - 1:
                     self.set_tile(x, y, 87)
 
+    def get_area(self):
+        return self.sizeX * self.sizeY
+    
+    def get_area_usable(self):
+        return (self.sizeX - 1) * (self.sizeY - 1)
+
     def get_tile(self, x, y):
         if not self.is_tile_in_bounds(x,y):
             return -1
 
         return self.map[y][x]
+    
+    def get_tile_population(self, id):
+        count = 0
+        for y in range(self.sizeY):
+            for x in range(self.sizeX):
+                if self.map[y][x] == id:
+                    count += 1
+        return count
     
     def is_tile_in_bounds(self, x, y):
         if x < 0 or x >= self.sizeX:

@@ -5,14 +5,15 @@ import random
 import map
 
 class RoadGenerator():
-    def __init__(self, map):
-        self.map = map
+    def __init__(self, map, road_coverage=18):
+        self.built_tiles = set()
         self.gate_direction = None
         self.gate_location = None
         self.initial_road_location = None
+        self.map = map
+        self.road_coverage = road_coverage
         self.tail_tile_queue = []
         self.valid_roads = [ord('r'), ord('G')]
-        self.built_tiles = []
 
     def _attempt_build_tile(self, x, y, neighbors, free_space):
         # We choose the intial tile and see what is around
@@ -76,12 +77,20 @@ class RoadGenerator():
             #    pass # DON'T BUILD
 
         elif len(neighbors) == 2:
-            print("WARNING: NEIGHBORS == 2 NOT YET IMPLEMENTED")
-            print(neighbors)
+            if len(free_space) >= 1:
+                index = random.randint(0, len(free_space) - 1)
+                desired_tile = free_space[index]
+                free_space = self._build(desired_tile, free_space)
         elif len(neighbors) == 3:
-            print("WARNING: NEIGHBORS == 3 NOT YET IMPLEMENTED")
+            if len(free_space) >= 1:
+                index = random.randint(0, len(free_space) - 1)
+                desired_tile = free_space[index]
+                free_space = self._build(desired_tile, free_space)
         elif len(neighbors) == 4:
-            print("WARNING: NEIGHBORS == 4 NOT YET IMPLEMENTED")
+            if len(free_space) >= 1:
+                index = random.randint(0, len(free_space) - 1)
+                desired_tile = free_space[index]
+                free_space = self._build(desired_tile, free_space)
 
         return built
     
@@ -90,7 +99,7 @@ class RoadGenerator():
         if free_space:
             free_space.remove(desired_tile)
         self.tail_tile_queue.append(desired_tile)
-        self.built_tiles.append(desired_tile)
+        self.built_tiles.add(desired_tile)
         return free_space
     
     def _choose_gate_tile(self, x, y):
@@ -227,21 +236,36 @@ class RoadGenerator():
         self.gate_location = self._choose_gate_tile(map_size_x, map_size_y)
         self.initial_road_location = self._choose_initial_road_tile()
 
+        # Initial generation of the city borders and the customs gate
         self.map.generate_walls()
         self.map.set_tile(
             self.gate_location[0],
             self.gate_location[1],
             ord('G')
         )
+
+        # Initial run of the road generation
         self._build((self.initial_road_location[0], self.initial_road_location[1]))
         self._process_queue()
+
+        # Check to see if we need any further roads
+        while(self.map.get_tile_population(ord('r')) / self.map.get_area_usable() <= self.road_coverage / 100.0):
+            # Choose a random road tile to branch off from
+            tile_index = random.randint(0, len(self.built_tiles) - 1)
+            tile = list(self.built_tiles)[tile_index]
+
+            # Build on that road tile; should do the process
+            self._build((tile[0], tile[1]))
+            self._process_queue()
+
+        # Finally, all remaining space is grass
         self.map.generate_grass()
 
         return self.map
 
 if __name__ == '__main__':
-    map_size_x = 16
-    map_size_y = 9
+    map_size_x = 32
+    map_size_y = 32
     myMap = map.Map(map_size_x, map_size_y)
 
     # Let's start the road stuff
