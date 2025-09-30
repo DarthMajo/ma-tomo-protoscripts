@@ -13,7 +13,7 @@ class RoadGenerator():
         self.map = map
         self.road_coverage = road_coverage
         self.tail_tile_queue = []
-        self.valid_roads = [ord('r'), ord('G')]
+        self.valid_roads = [ord('r'), ord('G'), 9472, 9474, 9484, 9488, 9496, 9492, 9500, 9508, 9516, 9524, 9532]
 
     def _attempt_build_tile(self, x, y, neighbors, free_space):
         # We choose the intial tile and see what is around
@@ -262,6 +262,37 @@ class RoadGenerator():
         self.map.generate_grass()
 
         return self.map
+    
+    def stylize(self):
+        # We will go through every tile in the playable space and check its
+        # neighbors for figuring out how to stylize the char... will be
+        # important for when we go to Godot
+        for y in range(1, self.map.sizeY - 1):
+            for x in range(1, self.map.sizeX - 1):
+                if self.map.get_tile(x, y) == ord('r'):
+                    # Complex ones first
+                    if self.map.get_tile(x - 1, y) in self.valid_roads and self.map.get_tile(x + 1, y) in self.valid_roads and self.map.get_tile(x, y - 1) in self.valid_roads and self.map.get_tile(x, y + 1) in self.valid_roads:
+                        self.map.set_tile(x, y, 9532)
+                    elif self.map.get_tile(x - 1, y) in self.valid_roads and self.map.get_tile(x, y - 1) in self.valid_roads and self.map.get_tile(x + 1, y) in self.valid_roads:
+                        self.map.set_tile(x, y, 9524)
+                    elif self.map.get_tile(x - 1, y) in self.valid_roads and self.map.get_tile(x, y + 1) in self.valid_roads and self.map.get_tile(x + 1, y) in self.valid_roads:
+                        self.map.set_tile(x, y, 9516)
+                    elif self.map.get_tile(x + 1, y) in self.valid_roads and self.map.get_tile(x, y + 1) in self.valid_roads and self.map.get_tile(x, y - 1) in self.valid_roads:
+                        self.map.set_tile(x, y, 9500)
+                    elif self.map.get_tile(x - 1, y) in self.valid_roads and self.map.get_tile(x, y + 1) in self.valid_roads and self.map.get_tile(x, y - 1) in self.valid_roads:
+                        self.map.set_tile(x, y, 9508)
+                    elif self.map.get_tile(x - 1, y) in self.valid_roads and self.map.get_tile(x, y - 1) in self.valid_roads:
+                        self.map.set_tile(x, y, 9496)
+                    elif self.map.get_tile(x + 1, y) in self.valid_roads and self.map.get_tile(x, y - 1) in self.valid_roads:
+                        self.map.set_tile(x, y, 9492)
+                    elif self.map.get_tile(x - 1, y) in self.valid_roads and self.map.get_tile(x, y + 1) in self.valid_roads:
+                        self.map.set_tile(x, y, 9488)
+                    elif self.map.get_tile(x + 1, y) in self.valid_roads and self.map.get_tile(x, y + 1) in self.valid_roads:
+                        self.map.set_tile(x, y, 9484)
+                    elif self.map.get_tile(x - 1, y) in self.valid_roads and self.map.get_tile(x + 1, y) in self.valid_roads:
+                        self.map.set_tile(x, y, 9472)
+                    elif self.map.get_tile(x, y - 1) in self.valid_roads and self.map.get_tile(x, y + 1) in self.valid_roads:
+                        self.map.set_tile(x, y, 9474)
 
 if __name__ == '__main__':
     map_size_x = 32
@@ -273,4 +304,5 @@ if __name__ == '__main__':
 
     # Get the map with updated roads
     myMap = rg.generate()
+    rg.stylize()
     myMap.print_map()

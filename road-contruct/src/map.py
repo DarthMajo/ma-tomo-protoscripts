@@ -61,7 +61,7 @@ class Map():
         for y in range(self.sizeY):
             line = ""
             for x in range(self.sizeX):
-                line += str(chr(self.map[y][x])) + ' '
+                line += str(chr(self.map[y][x]))
             print(line)
 
     def set_tile(self, x, y, new_value):
