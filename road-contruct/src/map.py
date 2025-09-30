@@ -6,8 +6,28 @@ class Map():
         self.sizeX = x
         self.sizeY = y
 
+    def generate_grass(self):
+        for y in range(self.sizeY):
+            for x in range(self.sizeX):
+                if self.get_tile(x, y) == 0:
+                    self.set_tile(x, y, 46)
+
+    def generate_walls(self):
+        for y in range(self.sizeY):
+            for x in range(self.sizeX):
+                if x == 0 or x == self.sizeX - 1 \
+                    or y == 0 or y == self.sizeY - 1:
+                    self.set_tile(x, y, 87)
+
     def get_tile(self, x, y):
         return self.map[y][x]
+    
+    def is_tile_in_bounds(self, x, y):
+        if x < 1 or x > self.sizeX:
+            return False
+        if y < 1 or y > self.sizeY:
+            return False
+        return True
 
     def init_map(self, x, y):
         mapY = []
@@ -24,7 +44,7 @@ class Map():
         for y in range(self.sizeY):
             line = ""
             for x in range(self.sizeX):
-                line += str(self.map[y][x]) + ' '
+                line += str(chr(self.map[y][x])) + ' '
             print(line)
 
     def set_tile(self, x, y, new_value):
