@@ -10,6 +10,80 @@ class RoadGenerator():
         self.gate_direction = None
         self.gate_location = None
         self.initial_road_location = None
+        self.tail_tile_queue = []
+        self.valid_roads = [ord('r'), ord('G')]
+        self.built_tiles = []
+
+    def _attempt_build_tile(self, x, y, neighbors, free_space):
+        # We choose the intial tile and see what is around
+        # If there are two, have a greater chance to plop down,
+        # and so on for three and four.
+        # If there is only one, have a good chance to go opposite direction;
+        # 1/8 of chance to turn
+        # After plop, pop node out of list and append all 90 degree null nodes
+        built = []
+
+        if len(neighbors) == 1:
+            dice_roll = random.randint(0, 999)
+
+            # We want a decent chance the road goes straight
+            # Here are the odds:
+            #   67.5% the road is straight
+            #   22.5% the road turns
+            #   10% no additional road
+            if dice_roll < 675:
+                # Find the opposite road tile than what is the current neighbor
+                neighbor = neighbors[0]
+                diffx = neighbor[0] - x
+                diffy = neighbor[1] - y
+                desired_tile = (x - diffx, y - diffy)
+
+                # Build this tile if it is an allowed tile
+                if desired_tile in free_space:
+                    free_space = self._build(desired_tile, free_space)
+                else:
+                    # If we made it here, we want a road, but it is invalid.
+                    # We want to then try to curve the road
+                    dice_roll += 225
+            if dice_roll >= 675 and dice_roll < 900:
+                # Turn a 90 or 270 degree turn
+                neighbor = neighbors[0]
+                diffx = neighbor[0] - x
+                diffy = neighbor[1] - y
+                flip_a_coin = random.randint(0,1)
+                desired_tile = (-1, -1)
+                
+                # We have to see what axis the road comes from
+                # So whichever diff=0 is what we choose
+                if diffy == 0:
+                    # Then we flip for East vs. West
+                    if flip_a_coin == 0 and (x, y - 1) in free_space:
+                        desired_tile = (x, y - 1)
+                    else:
+                        desired_tile = (x, y + 1)
+                else:
+                    # Then we flip for North vs. South
+                    if flip_a_coin == 0 and (x - 1, y) in free_space:
+                        desired_tile = (x - 1, y)
+                    else:
+                        desired_tile = (x + 1, y)
+
+                # Build the tile
+                if desired_tile in free_space:
+                    free_space = self._build(desired_tile, free_space)
+
+            #else:
+            #    pass # DON'T BUILD
+
+        return built
+    
+    def _build(self, desired_tile, free_space=None):
+        self.map.set_tile(desired_tile[0], desired_tile[1], ord('r'))
+        if free_space:
+            free_space.remove(desired_tile)
+        self.tail_tile_queue.append(desired_tile)
+        self.built_tiles.append(desired_tile)
+        return free_space
     
     def _choose_gate_tile(self, x, y):
         # Do we do the north, south, east, or west corner?
@@ -62,6 +136,41 @@ class RoadGenerator():
         
         return True
     
+    def _process_queue(self):
+        while len(self.tail_tile_queue) > 0:
+            tile = self.tail_tile_queue.pop(0)
+            self._process_tile(tile[0], tile[1])
+    
+    def _process_tile(self, current_x, current_y):        
+        # Find out how many neighbors there are that are roads
+        check_neighbors = self._process_neighbors(current_x, current_y)
+        neighbors = check_neighbors[0]
+        free_space = check_neighbors[1]
+
+        # Depending on neighbors, there is a higher chance of building a road
+        new_tiles = self._attempt_build_tile(current_x, current_y, neighbors, free_space)
+        self.tail_tile_queue.extend(new_tiles)
+
+        return len(new_tiles)
+    
+    def _process_neighbor(self, x, y, neighbors, free_space):
+        tile_value = self.map.get_tile(x, y)
+        if tile_value in self.valid_roads:
+            neighbors.append((x,y))
+        elif self._is_valid_tile(x, y):
+            free_space.append((x,y))
+
+        return (neighbors, free_space)
+    
+    def _process_neighbors(self, current_x, current_y):
+        neighbors = []
+        free_space = []
+        (neighbors, free_space) = self._process_neighbor(current_x - 1, current_y, neighbors, free_space)
+        (neighbors, free_space) = self._process_neighbor(current_x, current_y - 1, neighbors, free_space)
+        (neighbors, free_space) = self._process_neighbor(current_x + 1, current_y, neighbors, free_space)
+        (neighbors, free_space) = self._process_neighbor(current_x, current_y + 1, neighbors, free_space)
+        return (neighbors, free_space)
+    
     def _will_create_two_by_two(self, x, y):
         return self._check_corner_for_three_roads(x, y, 'nw') or \
         self._check_corner_for_three_roads(x, y, 'ne') or \
@@ -109,10 +218,18 @@ class RoadGenerator():
     def generate(self):
         self.gate_location = self._choose_gate_tile(map_size_x, map_size_y)
         self.initial_road_location = self._choose_initial_road_tile()
+        self.tail_tile_queue.append(
+            (self.initial_road_location[0], self.initial_road_location[1])
+        )
 
         self.map.generate_walls()
-        self.map.set_tile(self.gate_location[0], self.gate_location[1], ord('G'))
-        self.map.set_tile(self.initial_road_location[0], self.initial_road_location[1], ord('r'))
+        self.map.set_tile(
+            self.gate_location[0],
+            self.gate_location[1],
+            ord('G')
+        )
+        self._build((self.initial_road_location[0], self.initial_road_location[1]))
+        self._process_queue()
         self.map.generate_grass()
 
         return self.map
