@@ -26,9 +26,9 @@ class Map():
         return self.map[y][x]
     
     def is_tile_in_bounds(self, x, y):
-        if x < 0 or x > self.sizeX:
+        if x < 0 or x >= self.sizeX:
             return False
-        if y < 0 or y > self.sizeY:
+        if y < 0 or y >= self.sizeY:
             return False
         return True
 

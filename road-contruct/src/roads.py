@@ -75,6 +75,14 @@ class RoadGenerator():
             #else:
             #    pass # DON'T BUILD
 
+        elif len(neighbors) == 2:
+            print("WARNING: NEIGHBORS == 2 NOT YET IMPLEMENTED")
+            print(neighbors)
+        elif len(neighbors) == 3:
+            print("WARNING: NEIGHBORS == 3 NOT YET IMPLEMENTED")
+        elif len(neighbors) == 4:
+            print("WARNING: NEIGHBORS == 4 NOT YET IMPLEMENTED")
+
         return built
     
     def _build(self, desired_tile, free_space=None):
@@ -141,7 +149,7 @@ class RoadGenerator():
             tile = self.tail_tile_queue.pop(0)
             self._process_tile(tile[0], tile[1])
     
-    def _process_tile(self, current_x, current_y):        
+    def _process_tile(self, current_x, current_y):
         # Find out how many neighbors there are that are roads
         check_neighbors = self._process_neighbors(current_x, current_y)
         neighbors = check_neighbors[0]
@@ -218,9 +226,6 @@ class RoadGenerator():
     def generate(self):
         self.gate_location = self._choose_gate_tile(map_size_x, map_size_y)
         self.initial_road_location = self._choose_initial_road_tile()
-        self.tail_tile_queue.append(
-            (self.initial_road_location[0], self.initial_road_location[1])
-        )
 
         self.map.generate_walls()
         self.map.set_tile(
