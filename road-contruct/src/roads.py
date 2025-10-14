@@ -13,7 +13,7 @@ class RoadGenerator():
         self.map = map
         self.road_coverage = road_coverage
         self.tail_tile_queue = []
-        self.valid_roads = [ord('r'), ord('G'), 9472, 9474, 9484, 9488, 9496, 9492, 9500, 9508, 9516, 9524, 9532]
+        self.valid_roads = [ord('r'), ord('G'), 9472, 9474, 9484, 9488, 9496, 9492, 9500, 9508, 9516, 9524, 9532, 8847, 8848, 8851, 8852]
 
     def _attempt_build_tile(self, x, y, neighbors, free_space):
         # We choose the intial tile and see what is around
@@ -293,6 +293,14 @@ class RoadGenerator():
                         self.map.set_tile(x, y, 9472)
                     elif self.map.get_tile(x, y - 1) in self.valid_roads and self.map.get_tile(x, y + 1) in self.valid_roads:
                         self.map.set_tile(x, y, 9474)
+                    elif self.map.get_tile(x + 1, y) in self.valid_roads:
+                        self.map.set_tile(x, y, 8847)
+                    elif self.map.get_tile(x - 1, y) in self.valid_roads:
+                        self.map.set_tile(x, y, 8848)
+                    elif self.map.get_tile(x, y + 1) in self.valid_roads:
+                        self.map.set_tile(x, y, 8851)
+                    elif self.map.get_tile(x, y - 1) in self.valid_roads:
+                        self.map.set_tile(x, y, 8852)
 
 if __name__ == '__main__':
     map_size_x = 32
