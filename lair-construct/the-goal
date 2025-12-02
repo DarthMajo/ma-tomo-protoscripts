@@ -1,0 +1,18 @@
+The goal with this directory is to make a dungeon/lair generator.
+
+The generation of such a lair shall be done like so:
+    We have a starting point. Place a room of random X and Y size.
+        The minimum size of a room is 3x3 blocks, since the room also includes
+        the walls.
+
+        ---
+        -x-
+        ---
+
+    Then at a random wall point, it attempts to make a new room.
+        - Check in the void if a room size X and Y is possible
+            - If not, calculate the maximum X and Y size the room could be
+            - Then place the room, and be sure to have the door there
+                - The difficult part in this could be that the door is not
+                  necessarily the center of the room. It really could be
+                  anything.
