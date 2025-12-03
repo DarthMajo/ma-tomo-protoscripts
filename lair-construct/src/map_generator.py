@@ -17,6 +17,15 @@ class MapGenerator():
         random.seed(seed)
 
         # Place initial room
+        self.place_initial_room()
+
+        # Choose where the next room goes
+        next_room = self.rg.choose_valid_door_tile(self.map)
+        self.map = self.rg.place_door(self.map, next_room['door'][0], next_room['door'][1])
+
+        # Loop until target is reached (TODO: TBD)
+
+    def place_initial_room(self):
         room_size_x = random.randint(3, 20)
         room_size_y = random.randint(3, 20)
         room_pos_x = int(self.map_size_x / 2 - room_size_x / 2)
@@ -30,8 +39,6 @@ class MapGenerator():
             door_x=-1, 
             door_y=-1
         )
-
-        # Loop until target is reached (TODO: TBD)
 
     def place_room(self, pos_x, pos_y, size_x, size_y):
         """ This will attempt to put a room.

@@ -6,6 +6,14 @@ class Map():
         self.sizeX = x
         self.sizeY = y
 
+    def get_all_tiles_of_value(self, val):
+        all_val_tiles = []
+        for x in range(self.sizeX):
+            for y in range(self.sizeY):
+                if self.get_tile(x, y) == val:
+                    all_val_tiles.append((x, y))
+        return all_val_tiles
+
     def get_area(self):
         return self.sizeX * self.sizeY
     
@@ -17,6 +25,12 @@ class Map():
             return -1
 
         return self.map[y][x]
+    
+    def is_perimeter_tile(self, x, y):
+        if x == 0 or x == self.sizeX - 1 or \
+            y == 0 or y == self.sizeY - 1:
+            return True
+        return False
     
     def is_tile_in_bounds(self, x, y):
         if x < 0 or x >= self.sizeX:
