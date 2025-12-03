@@ -40,7 +40,10 @@ class Map():
         for y in range(self.sizeY):
             line = ""
             for x in range(self.sizeX):
-                line += str(chr(self.map[y][x]))
+                if self.map[y][x] == 0:
+                    line += '~'
+                else:
+                    line += str(chr(self.map[y][x]))
             print(line)
 
     def set_tile(self, x, y, new_value):

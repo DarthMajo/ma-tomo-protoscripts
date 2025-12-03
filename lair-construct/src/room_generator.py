@@ -4,21 +4,22 @@ class RoomGenerator():
     def __init__(self):
         pass
 
-    def build_room(self, x, y, m, door_x, door_y)
+    def build_room(self, pos_x, pos_y, size_x, size_y, m, door_x, door_y):
         # Builds a room of x and y size on map m
         # The door location is where the origin of the room will begin
-        
-        # First, calc direction the room will be placed. This will be done by
-        # checking the adjacent floor tile. The room will begin on the tile
-        # opposite from the floor tile and the door.
+        for x in range(pos_x, pos_x + size_x):
+            for y in range(pos_y, pos_y + size_y):
+                # TODO: ADD DOOR FUNCTIONALITY
+                if x == door_x and y == door_y:
+                    m.set_tile(x, y, 68)
+                if self._is_outer_tile(pos_x, pos_y, size_x, size_y, x, y):
+                    m.set_tile(x, y, 88)
+                else:
+                    m.set_tile(x, y, 46)
+        return m
 
-        # See if we can put room size x and y in the room.
-        #     If we cannot, see if x or y that is the problem. Scale down and try again.
-        #     If the room size becomes x=3,y=3 and still invalid, abort.
-        pass
-
-    def calculate_room_starting_tile(self, m, door_x, door_y):
-        pass
-
-    def is_room_placement_valid(self):
-        pass
+    def _is_outer_tile(self, corner_x, corner_y, size_x, size_y, cur_x, cur_y):
+        if cur_x != corner_x and cur_y != corner_y and \
+            cur_x != corner_x + size_x - 1 and cur_y != corner_y + size_y - 1:
+            return 0
+        return 1
