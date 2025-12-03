@@ -10,7 +10,7 @@ class MapGenerator():
         self.map_size_x = map_size_x
         self.map_size_y = map_size_y
         self.map = map.Map(self.map_size_x, self.map_size_y)
-        self.rg = room_generator.RoomGenerator()
+        self.rg = room_generator.RoomGenerator(4, 14)
 
     def generate(self, seed):
         # Generate a map via a seed
@@ -20,14 +20,17 @@ class MapGenerator():
         self.place_initial_room()
 
         # Choose where the next room goes
-        next_room = self.rg.choose_valid_door_tile(self.map)
-        self.map = self.rg.place_door(self.map, next_room['door'][0], next_room['door'][1])
+        for i in range(20): # TODO: FIX THIS HARD CODED LOOP
+            next_room = self.rg.choose_valid_door_tile(self.map)
+            #self.map = self.rg.place_door(self.map, next_room['door'][0], next_room['door'][1])
 
-        # Loop until target is reached (TODO: TBD)
+            # Loop until target is reached (TODO: TBD)
+            self.rg.build_room_smart(self.map, next_room)
+            #self.map.print_map()
 
     def place_initial_room(self):
-        room_size_x = random.randint(3, 20)
-        room_size_y = random.randint(3, 20)
+        room_size_x = random.randint(self.rg.min_room_size, self.rg.max_room_size)
+        room_size_y = random.randint(self.rg.min_room_size, self.rg.max_room_size)
         room_pos_x = int(self.map_size_x / 2 - room_size_x / 2)
         room_pos_y = int(self.map_size_y / 2 - room_size_y / 2)
         self.rg.build_room(
@@ -39,6 +42,20 @@ class MapGenerator():
             door_x=-1, 
             door_y=-1
         )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     def place_room(self, pos_x, pos_y, size_x, size_y):
         """ This will attempt to put a room.
@@ -62,6 +79,7 @@ class MapGenerator():
                 tile_value = self.map.get_tile(x, y)
                 if tile_value != 0:
                     # We need to see if the room could shrink and fit
+
 
                     # If size_x and size_y are at the min values, too bad
                     if size_x == 3 and size_y == 3:
