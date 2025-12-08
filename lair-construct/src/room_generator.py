@@ -3,9 +3,10 @@
 import random
 
 class RoomGenerator():
-    def __init__(self, min_room_size=3, max_room_size=20):
+    def __init__(self, min_room_size=3, max_room_size=10):
         self.max_room_size = max_room_size
         self.min_room_size = min_room_size
+        self.verify_settings()
 
     def build_room(self, pos_x, pos_y, size_x, size_y, m, door_x, door_y):
         # Builds a room of x and y size on map m
@@ -70,7 +71,6 @@ class RoomGenerator():
 
             # See if this room works
             if self._is_empty_plot(m, pos_x, pos_y, room_size_x, room_size_y):
-                # TODO: breakpoint()
                 room_layout_not_chosen = False
                 for x in range(pos_x, pos_x + room_size_x):
                     for y in range(pos_y, pos_y + room_size_y):
@@ -154,6 +154,22 @@ class RoomGenerator():
     def place_door(self, map, x, y):
         map.set_tile(x, y, 68)
         return map
+    
+    def set_max_size(self, x):
+        self.max_room_size = x
+        self.verify_settings()
+    
+    def set_min_size(self, x):
+        self.min_room_size = x
+        self.verify_settings()
+    
+    def verify_settings(self):
+        if self.min_room_size > self.max_room_size:
+            raise ValueError("The minimum room size cannot be greater than the maximum room size!")
+        if self.min_room_size <= 2:
+            raise ValueError("The minimum room size cannot be less than 3!")
+        if self.max_room_size <= 2:
+            raise ValueError("The maximum room size cannot be less than 3!")
     
     def _calc_depth(self, map, door, direction):
         dx = door[0]

@@ -6,11 +6,23 @@ import map
 import room_generator
 
 class MapGenerator():
-    def __init__(self, map_size_x, map_size_y):
+    def __init__(self, map_size_x=64, map_size_y=64, fill=85):
         self.map_size_x = map_size_x
         self.map_size_y = map_size_y
+        self.fill = fill
+        self.max_attempts = 10000
         self.map = map.Map(self.map_size_x, self.map_size_y)
-        self.rg = room_generator.RoomGenerator(4, 14)
+        self.rg = room_generator.RoomGenerator()
+        self.verify_settings()
+
+    def calc_filled(self):
+        total_area = self.map.get_area()
+        used_tiles = 0
+        for x in range(self.map.sizeX):
+            for y in range(self.map.sizeY):
+                if self.map.get_tile(x, y) != 0:
+                    used_tiles += 1
+        return (used_tiles / total_area) * 100.0
 
     def generate(self, seed):
         # Generate a map via a seed
@@ -20,13 +32,11 @@ class MapGenerator():
         self.place_initial_room()
 
         # Choose where the next room goes
-        for i in range(20): # TODO: FIX THIS HARD CODED LOOP
+        attempts = 0
+        while self.calc_filled() < self.fill and attempts < self.max_attempts:
             next_room = self.rg.choose_valid_door_tile(self.map)
-            #self.map = self.rg.place_door(self.map, next_room['door'][0], next_room['door'][1])
-
-            # Loop until target is reached (TODO: TBD)
             self.rg.build_room_smart(self.map, next_room)
-            #self.map.print_map()
+            attempts += 1
 
     def place_initial_room(self):
         room_size_x = random.randint(self.rg.min_room_size, self.rg.max_room_size)
@@ -43,48 +53,10 @@ class MapGenerator():
             door_y=-1
         )
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    def place_room(self, pos_x, pos_y, size_x, size_y):
-        """ This will attempt to put a room.
-        
-            Return status:
-                1: Yay all is good!
-                2: X is too large
-                3: Y is too large
-                4: X and Y are too large
-                5: Confirmed impossible fit
-        """
-        # See if all the tiles are free
-
-        # If so, change all tiles and return 1
-
-        # If not, then see why... is it x or y? Or both?
-        
-    def _tiles_free(self, pos_x, pos_y, size_x, size_y):
-        for x in range(pos_x, pos_x + size_x):
-            for y in range(pos_y, pos_y + size_y):
-                tile_value = self.map.get_tile(x, y)
-                if tile_value != 0:
-                    # We need to see if the room could shrink and fit
-
-
-                    # If size_x and size_y are at the min values, too bad
-                    if size_x == 3 and size_y == 3:
-                        return 5
-                else:
-                    pass
-        return 1
-
+    def verify_settings(self):
+        """Check to see if the settings for world creation are valid"""
+        # The room sizes cannot exeed the map size
+        if self.rg.max_room_size > self.map_size_x:
+            raise ValueError("The maximum room size exeeds the map_x size!")
+        if self.rg.max_room_size > self.map_size_y:
+            raise ValueError("The maximum room size exceeds the map_y size!")
